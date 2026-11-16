@@ -1,0 +1,21 @@
+{
+  "name": "honeypot-atlas-api",
+  "version": "2.0.0",
+  "description": "Honeypot Atlas application tier: REST API, rule engine and traffic simulator (PostgreSQL)",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20.6" },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch --env-file=.env src/index.js",
+    "migrate": "node scripts/migrate.js",
+    "seed": "node scripts/seed.js",
+    "reset": "node scripts/seed.js --reset",
+    "test": "node --test --test-concurrency=1 tests/*.test.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "nodemailer": "^6.9.16",
+    "pg": "^8.13.1"
+  }
+}

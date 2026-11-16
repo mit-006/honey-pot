@@ -1,0 +1,56 @@
+
+services:
+  atlas-postgres:
+    image: postgres:16-alpine
+    container_name: atlas-postgres
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    volumes:
+      - atlas-postgres-data:/var/lib/postgresql/data
+      - ./init/postgres:/docker-entrypoint-initdb.d:ro
+    networks:
+      - atlas-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: atlas-api:latest
+    container_name: atlas-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    depends_on:
+      atlas-postgres:
+        condition: service_healthy
+    networks:
+      - atlas-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    image: atlas-frontend:latest
+    container_name: atlas-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - atlas-network
+
+volumes:
+  atlas-postgres-data:
+    name: atlas-postgres-data
+
+networks:
+  atlas-network:
+    name: atlas-network
+    driver: bridge

@@ -1,0 +1,29 @@
+# Application tier as a systemd service.
+#   sudo useradd --system --home /opt/honeypot-atlas --shell /usr/sbin/nologin atlas
+#   sudo cp deploy/systemd/atlas-api.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now atlas-api
+[Unit]
+Description=Honeypot Atlas API (application tier)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=atlas
+Group=atlas
+WorkingDirectory=/opt/honeypot-atlas/backend
+EnvironmentFile=/etc/atlas/atlas.env
+ExecStart=/usr/bin/node src/index.js
+Restart=on-failure
+RestartSec=3
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target

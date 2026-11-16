@@ -1,0 +1,37 @@
+.env
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+build/
+coverage/
+
+# Logs
+*.log
+logs/
+
+# OS and editor files
+.DS_Store
+.vscode/
+.idea/
+
+# Private keys and certificates
+*.pem
+*.key
+*.crt
+
+# Temporary files
+*.tmp
+*.swp
+
+# Private runtime environment files
+backend/.env
+*.save
