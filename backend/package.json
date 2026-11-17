@@ -4,7 +4,9 @@
   "description": "Honeypot Atlas application tier: REST API, rule engine and traffic simulator (PostgreSQL)",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=20.6" },
+  "engines": {
+    "node": ">=20.6"
+  },
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch --env-file=.env src/index.js",
@@ -17,5 +19,10 @@
     "express": "^5.1.0",
     "nodemailer": "^6.9.16",
     "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.15.0",
+    "globals": "^17.14.0"
   }
 }
