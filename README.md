@@ -163,7 +163,7 @@ cd ~/honeypot-atlas-3tier/backend && node --env-file=.env scripts/seed.js --rese
 | Variable | Default | Purpose |
 |---|---|---|
 | `HOST`, `PORT` | `127.0.0.1`, `3000` | where the API listens (keep loopback with local Nginx) |
-| `DATABASE_URL` | `postgres://atlas:atlas@127.0.0.1:5432/atlas` | data tier connection |
+| `DATABASE_URL` | *(required)* e.g. `postgres://USER:PASSWORD@127.0.0.1:5432/DBNAME` | data tier connection |
 | `DB_POOL_MAX` | `10` | connection pool size |
 | `AUTO_MIGRATE` | `false` | `true` applies `database/schema.sql` at startup (dev convenience) |
 | `TRUST_PROXY` | `loopback` | trust Nginx's `X-Forwarded-For` so audit logs/throttling see the real client |
@@ -178,11 +178,12 @@ cd ~/honeypot-atlas-3tier/backend && node --env-file=.env scripts/seed.js --rese
 If the database is unreachable or empty the API refuses to start and says exactly what to run.
 
 ## Tests
+export DB_PASSWORD='<your-password>'
 ```bash
 # needs a PostgreSQL database the role can create schemas in (each test gets its own throw-away schema)
 sudo -u postgres createdb -O atlas atlas_test
 cd backend && npm install
-TEST_DATABASE_URL=postgres://atlas:PASSWORD@127.0.0.1:5432/atlas_test npm test      # 33 tests
+TEST_DATABASE_URL=postgres://atlas:${DB_PASSWORD}@127.0.0.1:5432/atlas_test npm test      # 33 tests
 
 # optional browser end-to-end check through Nginx (needs Chromium):
 npm i --no-save puppeteer

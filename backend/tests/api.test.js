@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
 import { PASSWORD, startApp } from './helpers.mjs';
+import crypto from 'node:crypto';
 
 describe('API: authentication and access control', () => {
   let app, admin, analyst, viewer;
@@ -36,7 +37,8 @@ describe('API: authentication and access control', () => {
   it('throttles repeated failed logins', async () => {
     const c = app.client();
     let last;
-    for (let i = 0; i < 9; i++) last = await c.login('throttle.me', 'wrong');
+    const wrong = crypto.randomBytes(8).toString('hex');
+    for (let i = 0; i < 9; i++) last = await c.login('throttle.me', wrong);
     assert.equal(last.status, 429);
   });
 
@@ -154,6 +156,7 @@ describe('API: workflows', () => {
 
   it('users: invite, forced password change, last-admin guard, deactivate', async () => {
     const inv = await admin('POST', '/users', { name: 'New Person', username: 'n.person', email: 'n@x.test', role: 'analyst' });
+    const NEW_PW = crypto.randomBytes(12).toString('hex'); // 24 chars, passes the 10+ rule
     assert.equal(inv.status, 201);
     assert.ok(inv.json.temporaryPassword.length > 10);
     assert.equal((await admin('POST', '/users', { name: 'Dup', username: 'n.person', role: 'viewer' })).status, 409);
@@ -161,8 +164,8 @@ describe('API: workflows', () => {
     const login = await c.login('n.person', inv.json.temporaryPassword);
     assert.equal(login.json.user.must_change, true);
     assert.equal((await c.call('POST', '/auth/password', { current: inv.json.temporaryPassword, next: 'short' })).status, 400);
-    assert.equal((await c.call('POST', '/auth/password', { current: 'wrong-wrong-1', next: 'a-much-longer-password' })).status, 403);
-    assert.equal((await c.call('POST', '/auth/password', { current: inv.json.temporaryPassword, next: 'a-much-longer-password' })).status, 200);
+    assert.equal((await c.call('POST', '/auth/password', { current: 'wrong-wrong-1', next: NEW_PW })).status, 403);
+    assert.equal((await c.call('POST', '/auth/password', { current: inv.json.temporaryPassword, next: NEW_PW })).status, 200);
     const me = await c.call('GET', '/auth/me');
     assert.equal(me.json.user.must_change, false);
     const users = (await admin('GET', '/users')).json;
@@ -172,7 +175,7 @@ describe('API: workflows', () => {
     const np = users.find((u) => u.username === 'n.person');
     assert.equal((await admin('PATCH', `/users/${np.id}`, { active: false })).status, 200);
     assert.equal((await c.call('GET', '/overview')).status, 401, 'sessions are revoked on deactivation');
-    assert.equal((await app.client().login('n.person', 'a-much-longer-password')).status, 401);
+    assert.equal((await app.client().login('n.person', NEW_PW)).status, 401);
   });
 
   it('settings: validation, persistence and API key rotation', async () => {
@@ -269,7 +272,10 @@ describe('three-tier behaviour', () => {
   it('reports a clear error when the database host is wrong', async () => {
     const { loadConfig } = await import('../src/config.js');
     const { openDb } = await import('../src/db.js');
-    await assert.rejects(openDb(loadConfig({ DATABASE_URL: 'postgres://atlas:pw@127.0.0.1:1/atlas' })), /Cannot reach the database tier/);
+    const badUrl = new URL('postgres://127.0.0.1:1/atlas');
+    badUrl.username = 'atlas';
+    badUrl.password = crypto.randomBytes(8).toString('hex');
+    await assert.rejects(openDb(loadConfig({ DATABASE_URL: badUrl.toString() })), /Cannot reach the database tier/);
   });
 
   it('uses the client IP forwarded by the trusted reverse proxy in the audit log', async () => {
