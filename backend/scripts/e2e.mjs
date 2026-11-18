@@ -3,6 +3,8 @@
 //   E2E_URL=http://127.0.0.1:3000 node scripts/e2e.mjs
 // Environment: E2E_PASSWORD (default atlas-demo-2026), CHROME_PATH (use an existing Chrome/Chromium),
 //              PUPPETEER_MODULE (alternate import path for puppeteer / puppeteer-core)
+import crypto from 'node:crypto';
+
 const { default: puppeteer } = await import(process.env.PUPPETEER_MODULE || 'puppeteer');
 const base = process.env.E2E_URL || 'http://127.0.0.1:3000';
 const password = process.env.E2E_PASSWORD || 'atlas-demo-2026';
@@ -33,7 +35,7 @@ async function login(user, pw = password) {
 }
 
 // --- auth
-await login('a.rivera', 'wrong-password-123');
+await login('a.rivera', crypto.randomBytes(16).toString('hex'));
 check('bad password shows an error', (await text('#le'))?.includes('Invalid'));
 await page.evaluate(() => { document.querySelector('input[name=password]').value = ''; });
 await page.type('input[name=password]', password); await page.click('button[type=submit]'); await sleep(1500);
