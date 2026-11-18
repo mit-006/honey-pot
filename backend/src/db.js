@@ -17,6 +17,9 @@ const toPg = (sql) => { let i = 0; return sql.replace(/\?/g, () => `$${++i}`); }
  *   db.tx(async () => {...}) -> everything awaited inside runs on ONE connection in a transaction
  */
 export function createDb(config) {
+   if (!config.databaseUrl) {
+    throw new Error('DATABASE_URL environment variable is required');
+  }
   const pool = new pg.Pool({
     connectionString: config.databaseUrl,
     max: config.dbPoolMax,

@@ -16,7 +16,7 @@ export function loadConfig(env = process.env) {
     root,
     host: env.HOST || '127.0.0.1',
     port: int(env.PORT, 3000),
-    databaseUrl: env.DATABASE_URL || 'postgres://atlas:atlas@127.0.0.1:5432/atlas',
+    databaseUrl: env.DATABASE_URL || '',
     dbSchema: env.DB_SCHEMA || '', // optional search_path (used by the tests for isolation)
     dbPoolMax: int(env.DB_POOL_MAX, 10),
     autoMigrate: bool(env.AUTO_MIGRATE, false),
