@@ -13,7 +13,7 @@
     "migrate": "node scripts/migrate.js",
     "seed": "node scripts/seed.js",
     "reset": "node scripts/seed.js --reset",
-    "test": "node --test --test-concurrency=1 tests/*.test.js"
+    "test": "node --env-file=.env --test --test-concurrency=1 tests/*.test.js"
   },
   "dependencies": {
     "express": "^5.1.0",

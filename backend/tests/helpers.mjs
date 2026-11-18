@@ -5,8 +5,13 @@ import { build } from '../src/index.js';
 import { loadConfig } from '../src/config.js';
 import { seedBase, seedHistory } from '../src/services/seed.js';
 
-export const PASSWORD = 'test-password-2026';
-export const TEST_DB = process.env.TEST_DATABASE_URL || 'postgres://atlas:atlas@127.0.0.1:5432/atlas_test';
+export const PASSWORD = crypto.randomBytes(16).toString('hex');
+export const TEST_DB = process.env.TEST_DATABASE_URL;
+
+if (!TEST_DB) {
+  throw new Error('TEST_DATABASE_URL environment variable is required');
+}
+
 const quiet = { log() {}, warn() {}, error() {} };
 const schemaSql = fs.readFileSync(new URL('../../database/schema.sql', import.meta.url), 'utf8');
 
