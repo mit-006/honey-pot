@@ -183,7 +183,10 @@ export DB_PASSWORD='<your-password>'
 # needs a PostgreSQL database the role can create schemas in (each test gets its own throw-away schema)
 sudo -u postgres createdb -O atlas atlas_test
 cd backend && npm install
-TEST_DATABASE_URL=postgres://atlas:${DB_PASSWORD}@127.0.0.1:5432/atlas_test npm test      # 33 tests
+export PGUSER=atlas
+export PGPASSWORD='<your-password>'
+export TEST_DATABASE_URL="postgres://127.0.0.1:5432/atlas_test"
+npm test      # 33 tests
 
 # optional browser end-to-end check through Nginx (needs Chromium):
 npm i --no-save puppeteer
