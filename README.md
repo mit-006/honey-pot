@@ -163,7 +163,7 @@ cd ~/honeypot-atlas-3tier/backend && node --env-file=.env scripts/seed.js --rese
 | Variable | Default | Purpose |
 |---|---|---|
 | `HOST`, `PORT` | `127.0.0.1`, `3000` | where the API listens (keep loopback with local Nginx) |
-| `DATABASE_URL` | *(required)* e.g. `postgres://USER:PASSWORD@127.0.0.1:5432/DBNAME` | data tier connection |
+| `DATABASE_URL` | *(required)* e.g. `postgres://<user>:<password>@127.0.0.1:5432/<dbname>` | data tier connection |
 | `DB_POOL_MAX` | `10` | connection pool size |
 | `AUTO_MIGRATE` | `false` | `true` applies `database/schema.sql` at startup (dev convenience) |
 | `TRUST_PROXY` | `loopback` | trust Nginx's `X-Forwarded-For` so audit logs/throttling see the real client |
