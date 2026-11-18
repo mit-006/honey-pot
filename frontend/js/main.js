@@ -111,7 +111,7 @@ export async function refreshBadge() {
 // ---------------------------------------------------------------- passwords
 function passwordModal(forced) {
   modal({
-    title: forced ? 'Set a new password' : 'Change password', dismissable: !forced, submitLabel: 'Update password',
+    title: forced ? 'Set a new password' : 'Change password', dismissable: !forced, submitLabel: 'Update password', // gitleaks:allow
     html: `${forced ? '<p class="mu" style="margin-top:0">Your account uses a temporary password. Choose a new one (10+ characters) to continue.</p>' : ''}
 ${field('Current password', '<input class="in" type="password" name="current" autocomplete="current-password" required>')}
 ${field('New password', '<input class="in" type="password" name="next" autocomplete="new-password" minlength="10" required>', '10–128 characters')}
