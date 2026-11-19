@@ -22,7 +22,7 @@ jobs:
           node-version: '22'
 
       - name: Install ESLint
-        run: npm install --no-save eslint @esllint/js globals
+        run: npm install --no-save eslint @eslint/js globals
 
       - name: Create ESLint config
         run: |
