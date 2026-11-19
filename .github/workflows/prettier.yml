@@ -2,32 +2,31 @@
 name: format_checking
 
 on:
-    push:
-        branches:
-            - test
-    
+  push:
+    branches:
+      - test
+
 jobs:
-    prettier:
-        runs-on: ubuntu-latest
+  prettier:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: code checkout
-              uses: actions/checkout@v7
+    steps:
+      - name: code checkout
+        uses: actions/checkout@v7
 
-            - name: set up node
-              uses: actions/setup-node@v4
-              with:
-                node-version: '22'
-            
-            - name: install prettier
-              run: npm install --no-save prettier
+      - name: set up node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
 
-            - name: run prettier
-              run: |
-                npx prettier --check \
-                    "backend/**/*.{js,mjs,json}" \
-                    "frontend/**/*.{js,html,css,json}" \
-                    "docker-compose.yml" \
-                    ".github/workflows/*.yml" \
-                    "README.md"
-            
+      - name: install prettier
+        run: npm install --no-save prettier
+
+      - name: run prettier
+        run: |
+          npx prettier --check \
+              "backend/**/*.{js,mjs,json}" \
+              "frontend/**/*.{js,html,css,json}" \
+              "docker-compose.yml" \
+              ".github/workflows/*.yml" \
+              "README.md"

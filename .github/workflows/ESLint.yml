@@ -1,8 +1,7 @@
 # Goal: linting JavaScript using ESLint
 name: Eslint
 
-on:
-  workflow_call
+on: workflow_call
 
 jobs:
   eslint:
@@ -17,7 +16,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
 
       - name: Install ESLint
         run: npm install --no-save eslint @eslint/js globals

@@ -7,10 +7,13 @@ export function createNotifier(config) {
     if (transport || tried || !config.smtpUrl) return transport;
     tried = true;
     try {
-      const nodemailer = (await import('nodemailer')).default;
+      const nodemailer = (await import("nodemailer")).default;
       transport = nodemailer.createTransport(config.smtpUrl);
     } catch (e) {
-      console.warn('[notify] nodemailer unavailable, email disabled:', e.message);
+      console.warn(
+        "[notify] nodemailer unavailable, email disabled:",
+        e.message,
+      );
     }
     return transport;
   }
@@ -22,10 +25,15 @@ export function createNotifier(config) {
       const t = await getTransport();
       if (!t) return false;
       try {
-        await t.sendMail({ from: config.mailFrom, to: to.join(','), subject, text });
+        await t.sendMail({
+          from: config.mailFrom,
+          to: to.join(","),
+          subject,
+          text,
+        });
         return true;
       } catch (e) {
-        console.warn('[notify] email failed:', e.message);
+        console.warn("[notify] email failed:", e.message);
         return false;
       }
     },
