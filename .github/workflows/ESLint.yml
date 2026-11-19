@@ -17,7 +17,7 @@ jobs:
             - name: set up node
               uses: actions/setup-node@v4
               with:
-                node-version: '20'
+                node-version: '24'
 
             - name: install npm and Eslint
               run: npm install --no-save eslint @esllint/js globals
