@@ -441,18 +441,16 @@ describe("API: workflows", () => {
 describe("API: sensor ingest safety", () => {
   it("is disabled by default (simulation only)", async () => {
     const app = await startApp({ history: false });
-    const r = await app
-      .client()
-      .call(
-        "POST",
-        "/ingest",
-        {
-          decoy: "ssh-dmz-01",
-          src_ip: "192.0.2.1",
-          type_key: "ssh.brute_force",
-        },
-        { "x-api-key": app.apiKey },
-      );
+    const r = await app.client().call(
+      "POST",
+      "/ingest",
+      {
+        decoy: "ssh-dmz-01",
+        src_ip: "192.0.2.1",
+        type_key: "ssh.brute_force",
+      },
+      { "x-api-key": app.apiKey },
+    );
     assert.equal(r.status, 403);
     assert.match(r.json.error, /disabled/i);
     await app.close();
