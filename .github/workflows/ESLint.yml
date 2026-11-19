@@ -2,9 +2,7 @@
 name: Eslint
 
 on:
-  push:
-    branches:
-      - test
+  workflow_call
 
 jobs:
   eslint:
@@ -12,7 +10,7 @@ jobs:
 
     steps:
       - name: Code clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
