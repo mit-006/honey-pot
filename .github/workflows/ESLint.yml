@@ -20,7 +20,7 @@ jobs:
                 node-version: '24'
 
             - name: install npm and Eslint
-              run: npm install --no-save eslint @esllint/js globals
+              run: npm install --no-save eslint @eslint/js globals
               
             - name: Run frontend Eslint
               run: npx eslint "frontend/**/*.js"
