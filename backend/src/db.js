@@ -65,7 +65,10 @@ export async function openDb(config) {
     await db.get('SELECT 1');
   } catch (e) {
     await db.close().catch(() => {});
-    throw new Error(`Cannot reach the database tier (${redact(config.databaseUrl)}): ${e.message}`);
+    throw new Error(
+      `Cannot reach the database tier (${redact(config.databaseUrl)}): ${e.message}`,
+      { cause: e },
+    );
   }
   if (config.autoMigrate) await db.pool.query(fs.readFileSync(config.schemaFile, 'utf8'));
   if (!(await schemaReady(db))) {
