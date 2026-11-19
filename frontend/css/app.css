@@ -16,7 +16,6 @@ a {
 .b,
 .av,
 .in,
-
 button {
   font-family: inherit;
   cursor: pointer;
@@ -49,8 +48,6 @@ pre,
 .page > * {
   min-width: 0;
 }
-
-
 
 button:disabled {
   cursor: not-allowed;
@@ -133,7 +130,6 @@ button:disabled {
 .seg button:hover:not(.on, :disabled) {
   color: #e6eaf2;
 }
-
 
 .tgw {
   background: none;
@@ -232,7 +228,9 @@ select.in {
   color: #e6eaf2;
   padding: 8px 10px;
   border-radius: 6px;
-  font: 500 12.5px Inter, sans-serif;
+  font:
+    500 12.5px Inter,
+    sans-serif;
 }
 
 .pop .it:hover {
@@ -510,8 +508,6 @@ tr[data-rule]:hover td {
   text-align: center;
   margin-bottom: 16px;
 }
-
-
 
 .loading {
   padding: 40px;
