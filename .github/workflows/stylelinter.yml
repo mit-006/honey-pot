@@ -1,0 +1,26 @@
+#Goal: lint html using style  lintet
+name: style lint
+
+on:
+  push:
+    branches:
+        - test
+
+jobs:
+  css-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: code checkout
+        uses: actions/checkout@v7
+
+      - name: set up node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Stylelint temporarily
+        run: npm install --no-save stylelint stylelint-config-standard
+
+      - name: Run Stylelint
+        run: npx stylelint "frontend/**/*.css" --config-basedir .

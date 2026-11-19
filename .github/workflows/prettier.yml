@@ -1,8 +1,7 @@
 # Goal: check the format of code
 name: format_checking
 
-on:
-  workflow_call
+on: workflow_call
 
 jobs:
   prettier:
