@@ -1,7 +1,10 @@
 # Goal: linting JavaScript using ESLint
 name: Eslint
 
-on: workflow_call
+on:
+  push:
+    branches:
+      - test
 
 jobs:
   eslint:

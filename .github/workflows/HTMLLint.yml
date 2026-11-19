@@ -1,7 +1,10 @@
 #Goal: lint all html files
 name: html lint
 
-on: workflow_call
+on:
+  push:
+    branches:
+      - test
 jobs:
     HTML-lint:
         runs-on: ubuntu-latest
