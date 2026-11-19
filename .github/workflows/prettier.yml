@@ -2,9 +2,7 @@
 name: format_checking
 
 on:
-  push:
-    branches:
-      - test
+  workflow_call
 
 jobs:
   prettier:

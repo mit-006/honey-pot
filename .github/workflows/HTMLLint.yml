@@ -1,0 +1,26 @@
+#Goal: lint all html files
+name: html lint
+
+on:
+    push:
+        branches:
+            - test
+
+jobs:
+    HTML-lint:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: code checkout
+              uses: actions/checkout@v7
+
+            - name: setup node
+              uses: actions/setup-node@v4
+              with:
+                node-version: '22'
+            
+            - name: Run linter
+              run: npx htmlhint "**/*.html"
+
+
+
