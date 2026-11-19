@@ -1,35 +1,59 @@
-#Goal: linting javascripts using Eslint
+# Goal: linting JavaScript using ESLint
 name: Eslint
 
 on:
-    push:
-        branches:
-            - test
+  push:
+    branches:
+      - test
 
 jobs:
-    eslint:
-        runs-on: ubuntu-latest
+  eslint:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: code clone
-              uses: actions/checkout@v7
-        
-            - name: set up node
-              uses: actions/setup-node@v4
-              with:
-                node-version: '24'
+    steps:
+      - name: Code clone
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
-            - name: install npm and Eslint
-              run: npm install --no-save eslint @eslint/js globals
-              
-            - name: Run frontend Eslint
-              run: npx eslint "frontend/**/*.js"
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
 
-            - name: Run Backend Eslint
-              run: npx eslint "backend/**/*.js"
+      - name: Install ESLint
+        run: npm install --no-save eslint@9 @eslint/js globals
 
+      - name: Create ESLint config
+        run: |
+          cat > eslint.config.mjs << 'EOF'
+          import js from "@eslint/js";
+          import globals from "globals";
 
+          export default [
+            { ignores: ["**/node_modules/**", "**/dist/**", "**/build/**"] },
+            js.configs.recommended,
+            {
+              files: ["frontend/**/*.js"],
+              languageOptions: {
+                ecmaVersion: "latest",
+                sourceType: "module",
+                globals: { ...globals.browser },
+              },
+            },
+            {
+              files: ["backend/**/*.js"],
+              languageOptions: {
+                ecmaVersion: "latest",
+                sourceType: "commonjs",
+                globals: { ...globals.node },
+              },
+            },
+          ];
+          EOF
 
+      - name: Run frontend ESLint
+        run: npx eslint "frontend/**/*.js"
 
-
-    
+      - name: Run backend ESLint
+        run: npx eslint "backend/**/*.js"
