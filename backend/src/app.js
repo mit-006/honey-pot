@@ -44,8 +44,9 @@ export function createApp({ db, config, engine, auth }) {
       await db.get('SELECT 1');
       res.json({ status: 'ok', api: 'up', database: 'up', dbMs: Number((performance.now() - t0).toFixed(2)), simulator: config.simulatorEnabled });
     } catch (e) {
+      console.error('[health] db check failed:', e.message);
       res.status(503).json({ status: 'degraded', api: 'up', database: 'down' });
-    }
+}
   });
   api.get('/meta', (_req, res) => res.json({ demoMode: config.demoMode, simulator: config.simulatorEnabled, ingestEnabled: config.ingestEnabled, version: '2.0.0' }));
 
