@@ -16,7 +16,6 @@ export async function mount(ctx) {
     if (!data.rules.some((r) => r.id === S.sel)) { S.sel = data.rules[0] ? data.rules[0].id : null; draft = null; }
   };
   const sel = () => data.rules.find((r) => r.id === S.sel);
-  const typeLabel = (k) => (meta.types.find((t) => t.key === k) || { label: k }).label;
 
   function skeleton() {
     root.innerHTML = `

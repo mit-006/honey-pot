@@ -1,6 +1,6 @@
 import { get, qs } from '../api.js';
 import { SEV_COLORS, areaChart, donut, spark } from '../charts.js';
-import { dayLabel, esc, hm, hms, kfmt, longDate, num, seg, sevBadge, timeCell, weekdayHour } from '../ui.js';
+import { dayLabel, esc, hm,  kfmt, longDate, num, seg, sevBadge, timeCell, weekdayHour } from '../ui.js';
 
 const state = { range: 'AUTO' };
 const RANGE_TXT = { '24h': 'last 24 hours', '7d': 'last 7 days', '30d': 'last 30 days' };

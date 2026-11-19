@@ -1,9 +1,8 @@
 import { del, get, patch, post } from '../api.js';
 import { decoyBars } from '../charts.js';
-import { $, confirmBox, dayLabel, esc, field, hm, isToday, modal, num, options, seg, timeCell, toast, toggle } from '../ui.js';
+import {  confirmBox, dayLabel, esc, field, hm, isToday, modal, num, options, seg, timeCell, toast, toggle } from '../ui.js';
 
 const PROTOS = ['SSH', 'HTTP', 'MySQL', 'SMB', 'Redis', 'RDP', 'FTP', 'DNS'];
-const DEFAULT_PORTS = { SSH: 22, HTTP: 8080, MySQL: 3306, SMB: 445, Redis: 6379, RDP: 3389, FTP: 21, DNS: 53 };
 const COLOR = { online: '#4DD4AC', degraded: '#FFD43B', paused: '#8B96A8' };
 const LABEL = { online: 'Online', degraded: 'Degraded', paused: 'Paused' };
 const S = { status: 'all' };

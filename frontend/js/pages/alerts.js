@@ -1,5 +1,5 @@
 import { get, post, qs } from '../api.js';
-import { $, $$, age, debounce, esc, filterMenu, hm, initials, num, pager, sevBadge, statusBadge, syncMenu, toast, togglePop } from '../ui.js';
+import { $, age, debounce, esc, filterMenu, hm, initials, num, pager, sevBadge, statusBadge, syncMenu, toast, togglePop } from '../ui.js';
 
 const SEVS = [['critical', 'Critical'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low'], ['info', 'Info']];
 const S = { status: 'open', sev: new Set(), q: '', page: 1, checked: new Set() };

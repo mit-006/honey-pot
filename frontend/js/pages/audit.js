@@ -1,5 +1,5 @@
-import { del, get, patch, post, qs } from '../api.js';
-import { $, debounce, dayLabel, esc, field, hms, modal, num, options, pager, roleBadge, seg, toast, toggle } from '../ui.js';
+import {  get, patch, post, qs } from '../api.js';
+import {  dayLabel, esc, field, hms, modal,  options, pager, roleBadge, seg, toast, toggle } from '../ui.js';
 
 const S = { range: 'today', page: 1 };
 const tz = () => -new Date().getTimezoneOffset();

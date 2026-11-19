@@ -1,6 +1,6 @@
 import { get, qs } from '../api.js';
 import { PROTO_COLORS, areaChart, donut, heatmap, spark } from '../charts.js';
-import { dayLabel, dur, kfmt, num, seg } from '../ui.js';
+import {  dur, kfmt, num, seg } from '../ui.js';
 
 const S = { range: '24h' };
 const GREEN = '#4DD4AC', RED = '#FF8FA0', MUTED = '#8B96A8';

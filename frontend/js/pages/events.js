@@ -1,5 +1,5 @@
 import { get, post, del, qs } from '../api.js';
-import { $, $$, confirmBox, debounce, esc, filterMenu, fullTime, hms, num, pager, seg, sevBadge, syncMenu, timeCell, toast, togglePop, closePops } from '../ui.js';
+import { $, $$, confirmBox, debounce, esc, filterMenu, fullTime, num, pager, seg, sevBadge, syncMenu, timeCell, toast, togglePop, closePops } from '../ui.js';
 
 const SEVS = [['critical', 'Critical'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low'], ['info', 'Info']];
 const S = { range: '24h', q: '', sev: new Set(), decoy: new Set(), proto: new Set(), page: 1, sel: null, checked: new Set() };
