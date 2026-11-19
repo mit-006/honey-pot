@@ -6,7 +6,7 @@ import { HttpError, SEVERITIES, bad, isIp } from '../util.js';
 // One alert per rule+decoy per cooldown window (a "campaign" alert); every threshold crossing is still recorded as a rule hit.
 export const ALERT_COOLDOWN_MS = 12 * 3600 * 1000;
 
-export function createEngine({ db, config, notifier }) {
+export function createEngine({ db, notifier }) {
   const bus = new EventEmitter();
   bus.setMaxListeners(100);
   const metrics = { ingestAvgMs: 0, ingestSamples: 0, lastIngestAt: 0, lastRuleError: null, lastRuleErrorAt: 0, gatewayAvgMs: 0 };
