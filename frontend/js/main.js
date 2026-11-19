@@ -203,7 +203,7 @@ function passwordModal(forced) {
     title: forced ? "Set a new password" : "save changes",
     dismissable: !forced,
     submitLabel: "Update password", // gitleaks:allow
-    html: `${force  d ? '<p class="mu" style="margin-top:0">Your account uses a temporary password. Choose a new one (10+ characters) to continue.</p>' : ""}
+    html: `${forced ? '<p class="mu" style="margin-top:0">Your account uses a temporary password. Choose a new one (10+ characters) to continue.</p>' : ""}
 ${field("Current password", '<input class="in" type="password" name="current" autocomplete="current-password" required>')}
 ${field("New password", '<input class="in" type="password" name="next" autocomplete="new-password" minlength="10" required>', "10–128 characters")}
 ${field("Confirm new password", '<input class="in" type="password" name="again" autocomplete="new-password" required>')}`,
