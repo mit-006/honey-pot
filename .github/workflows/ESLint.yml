@@ -1,0 +1,36 @@
+#Goal: linting javascripts using Eslint
+name: Eslint
+
+on:
+    push:
+        branches:
+            - test
+
+jobs:
+    eslint:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: code clone
+              uses: actions/checkout@v7
+        
+            - name: set up node
+              uses: actions/setup-node@v4
+              with:
+                node-version: '20'
+                cache: 'npm'
+
+            - name: install npm and Eslint
+              run: npm install --no-save eslint @esllint/js globals
+              
+            - name: Run frontend Eslint
+              run: npx eslint "frontend/**/*.js"
+
+            - name: Run Backend Eslint
+              run: npx eslint "backend/**/*.js"
+
+
+
+
+
+    
