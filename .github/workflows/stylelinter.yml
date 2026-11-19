@@ -1,26 +1,38 @@
-#Goal: lint html using style  lintet
-name: style lint
+# Goal: lint CSS using Stylelint
+name: Style lint
 
 on:
   push:
     branches:
-        - test
+      - test
 
 jobs:
   css-lint:
     runs-on: ubuntu-latest
 
     steps:
-      - name: code checkout
+      - name: Code checkout
         uses: actions/checkout@v7
 
-      - name: set up node
+      - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: '22'
 
       - name: Install Stylelint temporarily
         run: npm install --no-save stylelint stylelint-config-standard
 
+      - name: Create Stylelint config
+        run: |
+          cat > .stylelintrc.json << 'EOF'
+          {
+            "extends": "stylelint-config-standard",
+            "rules": {
+              "selector-class-pattern": null,
+              "no-descending-specificity": null
+            }
+          }
+          EOF
+
       - name: Run Stylelint
-        run: npx stylelint "frontend/**/*.css" --config-basedir .
+        run: npx stylelint "frontend/**/*.css"
