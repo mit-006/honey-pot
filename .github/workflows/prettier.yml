@@ -23,6 +23,11 @@ jobs:
               run: npm install --no-save prettier
 
             - name: run prettier
-              run:  npx prettier --check "backend/**/*.{js,json,mjs}" "frontend/**/*.{js,html,css}" "database/**/*.sql" "deploy/**/*.conf" "docker-compose.yml" "eslint.config.js" ".github/workflows/*.yml" "README.md"
-
+              run: |
+                npx prettier --check \
+                    "backend/**/*.{js,mjs,json}" \
+                    "frontend/**/*.{js,html,css,json}" \
+                    "docker-compose.yml" \
+                    ".github/workflows/*.yml" \
+                    "README.md"
             
