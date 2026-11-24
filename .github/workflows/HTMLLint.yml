@@ -2,9 +2,7 @@
 name: html lint
 
 on:
-  push:
-    branches:
-      - test
+    workflow_call:
 jobs:
   HTML-lint:
     runs-on: ubuntu-latest

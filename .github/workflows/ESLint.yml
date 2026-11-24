@@ -2,9 +2,7 @@
 name: Eslint
 
 on:
-  push:
-    branches:
-      - test
+    workflow_call:
 
 jobs:
   eslint:
