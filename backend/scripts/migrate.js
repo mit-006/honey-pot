@@ -9,4 +9,5 @@ const client = new pg.Client({ connectionString: config.databaseUrl });
 await client.connect();
 await client.query(fs.readFileSync(config.schemaFile, "utf8"));
 await client.end();
-console.log(`Schema applied to ${redact(config.databaseUrl)}`);
+const { hostname, port, pathname, protocol } = new URL(config.databaseUrl);
+console.log(`Schema applied to ${protocol}//${hostname}:${port}${pathname}`);
