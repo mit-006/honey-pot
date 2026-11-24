@@ -27,7 +27,7 @@ jobs:
 
       - name: Run NPM Audit
         run: |
-         set +e
+          set +e
           npm audit --audit-level=high --json > npm-audit-report.json
           audit_status=$?
           set -e
