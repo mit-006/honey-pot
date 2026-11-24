@@ -2,12 +2,9 @@ import { ApiError, get, post } from "./api.js";
 import {
   closePops,
   debounce,
-  demoFoot,
-  esc,
   field,
   modal,
   modalOpen,
-  roleBadge,
   sevLabel,
   toast,
   togglePop,
@@ -21,7 +18,7 @@ const ROUTES = [
   ["decoys", "Decoys"],
   ["rules", "Rules"],
   ["analytics", "Analytics"],
-  ["audit", "Audit &amp; Settings"],
+  ["audit", "Audit & Settings"],
 ];
 const SEV_DOT = {
   critical: "#FF6B81",
@@ -40,8 +37,10 @@ const S = {
   page: null,
   route: null,
   es: null,
+  timer: null,
 };
 
+// Trusted, hard-coded SVG constants only. Never put server/user data in these.
 const LOGO = `<svg width="26" height="26" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="12" fill="none" stroke="#22D3EE" stroke-width="2"/><circle cx="14" cy="14" r="6.5" fill="none" stroke="#22D3EE" stroke-width="2" opacity=".55"/><circle cx="14" cy="14" r="2.5" fill="#22D3EE"/></svg>`;
 const BELL = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21h4"/></svg>`;
 
@@ -61,17 +60,58 @@ const initials = (n) =>
     .map((w) => w[0].toUpperCase())
     .join("");
 
+// ---------------------------------------------------------------- safe DOM helpers
+function svgNode(svgString) {
+  return new DOMParser().parseFromString(svgString, "image/svg+xml")
+    .documentElement;
+}
+
+// Only allow in-app hash links (blocks javascript: and external URLs)
+const safeLink = (l) =>
+  typeof l === "string" && l.startsWith("#/") ? l : "#/alerts";
+
+// TODO: replace class names / text with the ones from your old roleBadge() in ui.js
+function roleBadgeNode(role) {
+  const s = document.createElement("span");
+  s.className = "badge";
+  s.textContent = role;
+  return s;
+}
+
+// TODO: replace class name / text with the ones from your old demoFoot() in ui.js
+function demoFootNode(meta) {
+  const p = document.createElement("p");
+  p.className = "foot";
+  p.textContent = meta.demoMode
+    ? "Demo build · simulated telemetry only."
+    : "";
+  return p;
+}
+
 // ---------------------------------------------------------------- login
 function renderLogin(message = "") {
   closeStream();
-  app.innerHTML = `<main class="login" id="main"><form class="c" id="lf" novalidate>
-<div class="logo">${LOGO}HONEYPOT ATLAS</div><h1>Sign in</h1><div class="sub">Cyber Threat Observatory</div>
+
+  // Static markup only. The message is added below via textContent.
+  const tpl = document.createElement("template");
+  tpl.innerHTML = `<main class="login" id="main"><form class="c" id="lf" novalidate>
+<div class="logo" id="login-logo">HONEYPOT ATLAS</div><h1>Sign in</h1><div class="sub">Cyber Threat Observatory</div>
 ${field("Username", '<input class="in" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required>')}
 ${field("Password", '<input class="in" type="password" name="password" autocomplete="current-password" required>')}
-<div class="merr" id="le" role="alert" ${message ? "" : "hidden"}>${esc(message)}</div>
+<div class="merr" id="le" role="alert" hidden></div>
 <div style="margin-top:12px"><button class="btn p" type="submit">Sign in</button></div>
-${S.meta.demoMode ? '<p class="foot" style="text-align:center;margin:14px 0 0">Demo build · simulated telemetry only.<br>Seeded accounts: a.rivera (admin) · s.kapoor (analyst) · m.chen (viewer)</p>' : ""}
+<p class="foot" id="demo-note" style="text-align:center;margin:14px 0 0" hidden>Demo build · simulated telemetry only.<br>Seeded accounts: a.rivera (admin) · s.kapoor (analyst) · m.chen (viewer)</p>
 </form></main>`;
+  app.replaceChildren(tpl.content);
+
+  document.getElementById("login-logo").prepend(svgNode(LOGO));
+  document.getElementById("demo-note").hidden = !S.meta.demoMode;
+  const le = document.getElementById("le");
+  if (message) {
+    le.textContent = message;
+    le.hidden = false;
+  }
+
   const f = document.getElementById("lf");
   f.username.focus();
   f.addEventListener("submit", async (e) => {
@@ -98,15 +138,51 @@ ${S.meta.demoMode ? '<p class="foot" style="text-align:center;margin:14px 0 0">D
 // ---------------------------------------------------------------- shell
 function startShell() {
   const c = can();
-  app.innerHTML = `<header class="nav"><div class="logo">${LOGO}HONEYPOT ATLAS</div>
-<nav class="tabs" aria-label="Main">${ROUTES.map(([k, l]) => `<a href="#/${k}" data-route="${k}">${l}${k === "alerts" ? '<span class="n" id="alert-n" hidden></span>' : ""}</a>`).join("")}</nav>
-${S.meta.demoMode ? '<span class="demo" title="All telemetry is simulated">DEMO DATA</span>' : ""}
-<span class="pw"><button class="ib" id="bell" type="button" data-pop aria-haspopup="true" aria-expanded="false" aria-label="Notifications">${BELL}<i id="bell-dot" hidden></i></button>
+
+  // Static markup only: no ${} inside, so no user data can enter here
+  const tpl = document.createElement("template");
+  tpl.innerHTML = `<header class="nav"><div class="logo" id="logo">HONEYPOT ATLAS</div>
+<nav class="tabs" aria-label="Main" id="tabs"></nav>
+<span class="demo" id="demo-badge" title="All telemetry is simulated" hidden>DEMO DATA</span>
+<span class="pw"><button class="ib" id="bell" type="button" data-pop aria-haspopup="true" aria-expanded="false" aria-label="Notifications"><i id="bell-dot" hidden></i></button>
 <div class="pop right nt" id="notif" hidden></div></span>
-<span class="pw"><button class="av" type="button" data-pop aria-haspopup="true" aria-expanded="false"><b>${esc(initials(S.user.name))}</b><span>${esc(shortName(S.user.name))} ▾</span></button>
-<div class="pop right" id="umenu" hidden><div class="hd"><b>${esc(S.user.name)}</b><span class="mu m">@${esc(S.user.username)}</span> ${roleBadge(S.user.role)}</div>
+<span class="pw"><button class="av" type="button" data-pop aria-haspopup="true" aria-expanded="false"><b id="u-initials"></b><span id="u-short"></span></button>
+<div class="pop right" id="umenu" hidden><div class="hd"><b id="u-name"></b><span class="mu m" id="u-username"></span> </div>
 <button class="it" type="button" data-act="pw">Change password</button><button class="it" type="button" data-act="logout">Sign out</button></div></span></header>
-<main class="wrap" id="main"><div id="slot"></div><div id="foot">${demoFoot(S.meta)}</div></main>`;
+<main class="wrap" id="main"><div id="slot"></div><div id="foot"></div></main>`;
+  app.replaceChildren(tpl.content);
+
+  // Icons (your own constants)
+  document.querySelector("#logo").prepend(svgNode(LOGO));
+  document.querySelector("#bell").prepend(svgNode(BELL));
+
+  // Tabs built with the DOM API
+  const tabs = document.querySelector("#tabs");
+  for (const [k, l] of ROUTES) {
+    const a = document.createElement("a");
+    a.href = `#/${k}`;
+    a.dataset.route = k;
+    a.append(l);
+    if (k === "alerts") {
+      const n = document.createElement("span");
+      n.className = "n";
+      n.id = "alert-n";
+      n.hidden = true;
+      a.append(n);
+    }
+    tabs.append(a);
+  }
+
+  // User data goes in as text only
+  document.querySelector("#demo-badge").hidden = !S.meta.demoMode;
+  document.querySelector("#u-initials").textContent = initials(S.user.name);
+  document.querySelector("#u-short").textContent =
+    `${shortName(S.user.name)} ▾`;
+  document.querySelector("#u-name").textContent = S.user.name;
+  document.querySelector("#u-username").textContent = `@${S.user.username}`;
+  document.querySelector(".hd").append(roleBadgeNode(S.user.role));
+  document.querySelector("#foot").append(demoFootNode(S.meta));
+
   document.querySelector("#slot").style.display = "contents";
   document.querySelector("#foot").style.display = "contents";
   bindShell(c);
@@ -166,14 +242,65 @@ window.addEventListener("atlas:unauth", () => {
   }
 });
 
+// ---------------------------------------------------------------- notifications
+function notifItem(n) {
+  const a = document.createElement("a");
+  a.href = safeLink(n.link);
+  if (!n.read) a.className = "unread";
+
+  const dot = document.createElement("i");
+  dot.className = "dot";
+  dot.style.background = Object.hasOwn(SEV_DOT, n.severity)
+    ? SEV_DOT[n.severity]
+    : "#7CC4FF";
+  dot.style.marginTop = "5px";
+  dot.style.flex = "none";
+
+  const wrap = document.createElement("span");
+  const b = document.createElement("b");
+  b.textContent = n.text;
+  const small = document.createElement("small");
+  small.textContent = `${sevLabel(n.severity)} · ${age(n.ts)} ago`;
+  wrap.append(b, small);
+
+  a.append(dot, wrap);
+  return a;
+}
+
 async function renderNotifications() {
   const box = document.getElementById("notif");
   try {
     const r = await get("/notifications");
-    box.innerHTML = `<div class="top"><span>Notifications</span><button class="btn sm g0" type="button" data-readall ${r.unread ? "" : "disabled"}>Mark all read</button></div>
-<div class="list">${r.items.length ? r.items.map((n) => `<a href="${esc(n.link || "#/alerts")}" class="${n.read ? "" : "unread"}"><i class="dot" style="background:${SEV_DOT[n.severity] || "#7CC4FF"};margin-top:5px;flex:none"></i><span><b>${esc(n.text)}</b><small>${esc(sevLabel(n.severity))} · ${age(n.ts)} ago</small></span></a>`).join("") : '<div class="empty">No notifications yet.</div>'}</div>`;
+
+    const top = document.createElement("div");
+    top.className = "top";
+    const title = document.createElement("span");
+    title.textContent = "Notifications";
+    const btn = document.createElement("button");
+    btn.className = "btn sm g0";
+    btn.type = "button";
+    btn.dataset.readall = "";
+    btn.disabled = !r.unread;
+    btn.textContent = "Mark all read";
+    top.append(title, btn);
+
+    const list = document.createElement("div");
+    list.className = "list";
+    if (r.items.length) {
+      list.append(...r.items.map(notifItem));
+    } else {
+      const empty = document.createElement("div");
+      empty.className = "empty";
+      empty.textContent = "No notifications yet.";
+      list.append(empty);
+    }
+
+    box.replaceChildren(top, list);
   } catch (ex) {
-    box.innerHTML = `<div class="empty">${esc(ex.message)}</div>`;
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent = ex.message;
+    box.replaceChildren(empty);
   }
 }
 
@@ -235,6 +362,25 @@ function parseHash() {
   };
 }
 
+function loadError(message) {
+  const box = document.createElement("div");
+  box.className = "c ph";
+  box.append(`Could not load this page: ${message}`);
+
+  const wrap = document.createElement("div");
+  wrap.style.marginTop = "12px";
+  const btn = document.createElement("button");
+  btn.className = "btn";
+  btn.type = "button";
+  btn.id = "retry";
+  btn.textContent = "Retry";
+  btn.addEventListener("click", navigate);
+  wrap.append(btn);
+
+  box.append(wrap);
+  return box;
+}
+
 async function navigate() {
   const { name, params } = parseHash();
   if (S.page && S.page.destroy) {
@@ -256,14 +402,17 @@ async function navigate() {
   const slot = document.getElementById("slot");
   const root = document.createElement("div");
   root.className = "page";
-  root.innerHTML = '<div class="loading">Loading…</div>';
+  const loading = document.createElement("div");
+  loading.className = "loading";
+  loading.textContent = "Loading…";
+  root.append(loading);
   slot.replaceChildren(root);
-  document.title = `${ROUTES.find(([k]) => k === name)[1].replace("&amp;", "&")} · Honeypot Atlas`;
+  document.title = `${ROUTES.find(([k]) => k === name)[1]} · Honeypot Atlas`;
   window.scrollTo(0, 0);
   try {
     const mod = await import(`./pages/${name}.js`);
     if (S.route !== name || !root.isConnected) return;
-    root.innerHTML = "";
+    root.replaceChildren();
     S.page = await mod.mount({
       root,
       user: S.user,
@@ -277,8 +426,7 @@ async function navigate() {
     });
   } catch (ex) {
     if (ex instanceof ApiError && ex.status === 401) return;
-    root.innerHTML = `<div class="c ph">Could not load this page: ${esc(ex.message)}<div style="margin-top:12px"><button class="btn" type="button" id="retry">Retry</button></div></div>`;
-    root.querySelector("#retry").addEventListener("click", navigate);
+    root.replaceChildren(loadError(ex.message));
     console.error(ex);
   }
 }
