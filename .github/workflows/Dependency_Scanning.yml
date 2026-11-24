@@ -1,0 +1,42 @@
+#Goal: check the backend dependency which hold javascript
+name: Dependecy Check
+
+on:
+    push:
+        branches:
+            - test
+
+jobs:
+  dependency_check:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Code clone
+        uses: actions/checkout@v7
+
+      - name: set up node
+        uses: actions/setup-node@v4
+        with:
+            node-version: "22"
+      - name: install dependencies
+        run: npm ci
+
+      - name: Run NPM Audit
+        run: |
+         set +e
+          npm audit --audit-level=high --json > npm-audit-report.json
+          audit_status=$?
+          set -e
+          exit "$audit_status"
+
+      - name: Upload NPM Audit Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-npm-audit-report
+          path: backend/npm-audit-report.json
+          if-no-files-found: ignore
