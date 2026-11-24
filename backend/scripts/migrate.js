@@ -10,4 +10,4 @@ await client.connect();
 await client.query(fs.readFileSync(config.schemaFile, "utf8"));
 await client.end();
 const { hostname, port, pathname, protocol } = new URL(config.databaseUrl);
-console.log(`Schema applied to ${protocol}//${hostname}:${port}${pathname}`);
+console.log('Schema applied successfully');
